@@ -8,5 +8,6 @@ readme = "README.md"
 documentation = "https://docs.rs/indented_text_writer"
 repository = "https://github.com/taiyoungjang/rs_indented_text_writer"
 license = "MIT"
+description = "A simple IndentedTextWriter"
 
 [dependencies]

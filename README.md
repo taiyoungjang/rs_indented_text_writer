@@ -6,17 +6,27 @@ and characters for example.
 
 like : [C#](https://learn.microsoft.com/en-us/dotnet/api/system.codedom.compiler.indentedtextwriter) 
 ## Example
+write code:
 ```rust
-extern crate indented_text_writer;
-
-use indented_text_writer::IndentedTextWriter;
+#[cfg(test)]
+use super::IndentedTextWriter;
 
 fn main() {
-    let mut b = IndentedTextWriter::default();
-    b.write_line("hello world");
-    b.indents(2);
-    b.write_line("hello ");
-    b.unindents(2);
+    let mut writer = IndentedTextWriter::new("\t",1024);
+    writer.write_line("struct Data {");
+    writer.indents(1);
+    writer.write_line("name: String,");
+    writer.write_line("value: i32");
+    writer.unindents(1);
+    writer.write_line("}");
+    println!("{}",writer.string().unwrap());
+}
+```
+Result:
+```rust
+struct Data {
+	name: String,
+	value: i32
 }
 ```
 

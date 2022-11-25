@@ -35,8 +35,8 @@ impl Default for IndentedTextWriter {
 }
 
 impl IndentedTextWriter {
-    /// Return a new `Builder` with an initial capacity.
-    pub fn new(size: usize, tab_string: &String) -> IndentedTextWriter {
+    /// Return a new `IndentedTextWriter` with an initial capacity.
+    pub fn new(tab_string: &str, size: usize) -> IndentedTextWriter {
         let inner = Vec::with_capacity(size);
         IndentedTextWriter {
             inner,
@@ -220,10 +220,14 @@ mod tests {
     use super::IndentedTextWriter;
 
     #[test]
-    fn test_all_writes() {
-        let mut b = IndentedTextWriter::default();
-        b.write(String::from("hello"));
-        b.write_line(',');
-        assert_eq!(b.string().unwrap(), "hello, world it works");
+    fn tests_generate_class() {
+        let mut writer = IndentedTextWriter::new("\t",1024);
+        writer.write_line("struct Data {");
+        writer.indents(1);
+        writer.write_line("name: String,");
+        writer.write_line("value: i32");
+        writer.unindents(1);
+        writer.write_line("}");
+        println!("{}",writer.string().unwrap());
     }
 }
