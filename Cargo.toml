@@ -1,0 +1,11 @@
+[package]
+name = "indented_text_writer"
+version = "0.1.0"
+edition = "2021"
+authors = ["Taiyoung Jang <taiyoung.jang@gmail.com>"]
+keywords = ["string","indent","text_writer"]
+readme = "README.md"
+documentation = "https://docs.rs/indented_text_writer"
+repository = "https://github.com/taiyoungjang/rs_indented_text_writer"
+
+[dependencies]
