@@ -1,6 +1,4 @@
-# string-builder
-
-This crate is a simple string builder type allowing you to append anything that satisfies the
+This crate is a indented_text_writer type allowing you to append anything that satisfies the
 `ToBytes` trait to it. This includes things such as string slices, owned strings, byte slices,
 and characters for example.
 
