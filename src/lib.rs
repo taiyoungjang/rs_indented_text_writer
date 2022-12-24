@@ -53,6 +53,14 @@ impl IndentedTextWriter {
             self.tabs_pending = false;
         }
     }
+    /// get tab line
+    pub fn get_tab_line(&self) -> String {
+        let mut s = String::new();
+        for _ in 1..=self.indent_level {
+            s.push_str(&String::from_utf8_lossy(&self.tab_string));
+        }
+        s
+    }
     /// indent
     pub fn indent(&mut self) {
         self.indent_level += 1;
