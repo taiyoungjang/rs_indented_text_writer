@@ -1,3 +1,4 @@
+use std::cmp::max;
 use std::iter;
 use std::io::Write;
 use std::string::FromUtf8Error;
@@ -17,6 +18,8 @@ pub struct IndentedTextWriter {
     tab_string: Vec<u8>,
     indent_level: i32,
     tabs_pending: bool,
+    indent_begin: u8,
+    indent_end: u8
 }
 
 impl Default for IndentedTextWriter {
@@ -25,24 +28,30 @@ impl Default for IndentedTextWriter {
         let tab_string = " ".to_bytes();
         let indent_level = 0;
         let tabs_pending = false;
+        let indent_begin = '{'.to_bytes()[0];
+        let indent_end = '}'.to_bytes()[0];
         IndentedTextWriter {
             inner,
             tab_string,
             indent_level,
             tabs_pending,
+            indent_begin,
+            indent_end
         }
     }
 }
 
 impl IndentedTextWriter {
     /// Return a new `IndentedTextWriter` with an initial capacity.
-    pub fn new(tab_string: &str, size: usize) -> IndentedTextWriter {
+    pub fn new(tab_string: &str, size: usize, indent_begin:char, indent_end:char) -> IndentedTextWriter {
         let inner = Vec::with_capacity(size);
         IndentedTextWriter {
             inner,
             tab_string: tab_string.to_bytes(),
             indent_level: 0,
             tabs_pending: false,
+            indent_begin: indent_begin.to_bytes()[0],
+            indent_end: indent_end.to_bytes()[0],
         }
     }
     fn output_tabs(&mut self) {
@@ -119,10 +128,17 @@ impl IndentedTextWriter {
     /// writer.write_line("some string");
     /// ```
     pub fn write_line<T: ToBytes>(&mut self, buf: T) {
+        let bytes = buf.to_bytes();
+        let add_inc = bytes.iter().filter(|&&x| x == self.indent_begin).count() as i32;
+        let add_dec = bytes.iter().filter(|&&x| x == self.indent_end).count()as i32;
+        let inc = max(add_inc - add_dec, 0);
+        let dec = max(add_dec - add_inc, 0);
+        self.unindents(dec);
         self.output_tabs();
         self.inner.write_all(&buf.to_bytes()).unwrap();
         self.inner.write_all(LINE_ENDING).unwrap();
         self.tabs_pending = true;
+        self.indents(inc);
     }
 
     /// Add a type that can be viewed as a slice of bytes.
@@ -229,12 +245,10 @@ mod tests {
 
     #[test]
     fn tests_generate_class() {
-        let mut writer = IndentedTextWriter::new("\t",1024);
+        let mut writer = IndentedTextWriter::new("  ",1024, '{', '}');
         writer.write_line("struct Data {");
-        writer.indents(1);
         writer.write_line("name: String,");
         writer.write_line("value: i32");
-        writer.unindents(1);
         writer.write_line("}");
         println!("{}",writer.string().unwrap());
     }

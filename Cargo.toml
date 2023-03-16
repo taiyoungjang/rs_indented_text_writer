@@ -1,6 +1,6 @@
 [package]
 name = "indented_text_writer"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Taiyoung Jang <taiyoung.jang@gmail.com>"]
 keywords = ["string","indent","text_writer"]

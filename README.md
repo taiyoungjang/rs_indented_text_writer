@@ -10,12 +10,10 @@ write code:
 use super::IndentedTextWriter;
 
 fn main() {
-    let mut writer = IndentedTextWriter::new("\t",1024);
+    let mut writer = IndentedTextWriter::new("    ",1024, '{', '}');
     writer.write_line("struct Data {");
-    writer.indents(1);
     writer.write_line("name: String,");
     writer.write_line("value: i32");
-    writer.unindents(1);
     writer.write_line("}");
     println!("{}",writer.string().unwrap());
 }
@@ -23,8 +21,8 @@ fn main() {
 Result:
 ```rust
 struct Data {
-	name: String,
-	value: i32
+    name: String,
+    value: i32
 }
 ```
 
