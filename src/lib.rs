@@ -12,7 +12,7 @@ const LINE_ENDING: &'static [u8] = b"\r\n";
 const LINE_ENDING: &'static [u8] = b"\n";
 
 /// This is a growable string builder.
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct IndentedTextWriter {
     inner: Vec<u8>,
     tab_string: Vec<u8>,
