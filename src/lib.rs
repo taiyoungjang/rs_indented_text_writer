@@ -6,10 +6,8 @@ use std::string::FromUtf8Error;
 const DEFAULT_CAPACITY: usize = 1024;
 const MAX_UNICODE_WIDTH: usize = 4;
 
-#[cfg(windows)]
-const LINE_ENDING: &'static [u8] = b"\r\n";
-#[cfg(not(windows))]
-const LINE_ENDING: &'static [u8] = b"\n";
+const LINE_ENDING_WINDOWS: &'static [u8] = b"\r\n";
+const LINE_ENDING_NOT_WINDOWS: &'static [u8] = b"\n";
 
 /// This is a growable string builder.
 #[derive(Debug,Clone)]
@@ -19,7 +17,8 @@ pub struct IndentedTextWriter {
     indent_level: i32,
     tabs_pending: bool,
     indent_begin: u8,
-    indent_end: u8
+    indent_end: u8,
+    line_ending: &'static [u8],
 }
 
 impl Default for IndentedTextWriter {
@@ -36,14 +35,23 @@ impl Default for IndentedTextWriter {
             indent_level,
             tabs_pending,
             indent_begin,
-            indent_end
+            indent_end,
+            line_ending: LINE_ENDING_NOT_WINDOWS,
         }
     }
 }
 
 impl IndentedTextWriter {
-    /// Return a new `IndentedTextWriter` with an initial capacity.
-    pub fn new(tab_string: &str, size: usize, indent_begin:char, indent_end:char) -> IndentedTextWriter {
+    /// <h1>IndentedTextWriter</h1>
+    /// <ul>
+    /// <li>tab_string: tab string</li>
+    /// <li>size: buffer size</li>
+    /// <li>indent_begin: indent begin char</li>
+    /// <li>indent_end: indent end char</li>
+    /// <li>is_lf: line ending is lf</li>
+    /// </ul>
+    pub fn new(tab_string: &str, size: usize, indent_begin: char, indent_end: char, is_lf: bool) -> IndentedTextWriter {
+        let line_ending = if is_lf { LINE_ENDING_NOT_WINDOWS } else { LINE_ENDING_WINDOWS };
         let inner = Vec::with_capacity(size);
         IndentedTextWriter {
             inner,
@@ -52,6 +60,7 @@ impl IndentedTextWriter {
             tabs_pending: false,
             indent_begin: indent_begin.to_bytes()[0],
             indent_end: indent_end.to_bytes()[0],
+            line_ending
         }
     }
     fn output_tabs(&mut self) {
@@ -136,7 +145,7 @@ impl IndentedTextWriter {
         self.unindents(dec);
         self.output_tabs();
         self.inner.write_all(&buf.to_bytes()).unwrap();
-        self.inner.write_all(LINE_ENDING).unwrap();
+        self.inner.write_all(self.line_ending).unwrap();
         self.tabs_pending = true;
         self.indents(inc);
     }
@@ -148,12 +157,12 @@ impl IndentedTextWriter {
     /// ```rust
     /// use indented_text_writer::IndentedTextWriter;
     ///
-    /// let mut writer = IndentedTextWriter::new();
+    /// let mut writer = IndentedTextWriter::default();
     /// writer.write_line_no_tabs("some string");
     /// ```
     pub fn write_line_no_tabs<T: ToBytes>(&mut self, buf: T) {
         self.inner.write_all(&buf.to_bytes()).unwrap();
-        self.inner.write_all(LINE_ENDING).unwrap()
+        self.inner.write_all(self.line_ending).unwrap()
     }
 
     /// Return the current length in bytes of the underlying buffer.
@@ -245,7 +254,7 @@ mod tests {
 
     #[test]
     fn tests_generate_class() {
-        let mut writer = IndentedTextWriter::new("  ",1024, '{', '}');
+        let mut writer = IndentedTextWriter::new("  ",1024, '{', '}', true);
         writer.write_line("struct Data {");
         writer.write_line("name: String,");
         writer.write_line("value: i32");

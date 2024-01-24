@@ -10,7 +10,8 @@ write code:
 use super::IndentedTextWriter;
 
 fn main() {
-    let mut writer = IndentedTextWriter::new("    ",1024, '{', '}');
+   let is_lf = true;
+    let mut writer = IndentedTextWriter::new("    ",1024, '{', '}', is_lf);
     writer.write_line("struct Data {");
     writer.write_line("name: String,");
     writer.write_line("value: i32");
